@@ -14,6 +14,7 @@
 // ref:
 // - https://www.chromium.org/chromium-os/developer-library/reference/linux-constants/syscalls/
 // - https://man7.org/linux/man-pages/man2/syscall.2.html
+// - https://syscalls.mebeim.net/?table=x86/64/x64/latest
 
 #[repr(usize)]
 #[derive(Debug, PartialEq, Clone, Copy)]

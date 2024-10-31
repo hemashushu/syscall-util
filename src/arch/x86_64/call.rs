@@ -35,9 +35,9 @@
 // r10, r11 for temporary, as well as the registers above are not preserved
 // across a function call.
 //
-// in short, rax, rdi, rsi, rdx, rcx,    r10,    and r8, r9, 11 are scratch (caller saved) registers,
-//           ---  ---  ---  ---  ---     ---         --  --
-//           ret  a1   a2   a3   a4(std) a4(syscall) a5  a6
+// registers: rax, rdi, rsi, rdx, rcx,    r10,    and r8, r9, 11 are scratch (caller saved) registers,
+//            ---  ---  ---  ---  ---     ---         --  --
+// arguments: ret  a1   a2   a3   a4(std) a4(syscall) a5  a6
 //
 // any of these registers may be used in a function without have to save the original value.
 // this also means that you need to save them BEFORE invoking a function call
@@ -53,23 +53,24 @@
 
 // note:
 //
-// rcx and r11 are used for store the rip and rflags before syscall, when syscall is finish,
-// the old values of rcx and r11 will be restore, all these are done automatictly by 'syscall'.
-// because the values of rcx and r11 will be modified by the syscall, so to keep things simple,
-// it is better not to use these registers in the user program.
+// `rcx` and `r11` are used for store the values of `rip` and `rflags` register at syscall,
+// these are done automatictly by kernel.
+// when syscall is finish, the old values of `rcx` and `r11` would not be restored,
+// therefor, to keep things simple, it is better to mark them as 'out' in the inline ASM
+// to avoid the callee to use them.
 //
 // https://supercip971.github.io/02-wingos-syscalls.html
 
 // syscall example: print "hello world" to stdout
 //
 // ```yasm
-// STDOUT           equ     1
-// SYS_NUM_WRITE    equ     1
+// STDOUT_FILENO    equ     1
+// SYS_write        equ     1
 // message          db      "Hello, World!"
 // message_length   dq      13
 //
-// mov              rax,    SYS_NUM_WRITE
-// mov              rdi,    STDOUT
+// mov              rax,    SYS_write
+// mov              rdi,    STDOUT_FILENO
 // mov              rsi,    message
 // mov              rdx,    qword [message_length]
 // syscall
